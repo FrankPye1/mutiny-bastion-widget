@@ -39,24 +39,6 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             position: relative;
             overflow: hidden;
-            animation: slideIn 0.6s ease-out;
-            transition: all 0.3s ease;
-        }
-
-        .company-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(-120%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
         }
 
         .card-slider {
@@ -73,26 +55,21 @@
             align-items: center;
             gap: 15px;
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.6s ease;
+            transition: opacity 0.5s ease-in-out;
         }
 
         .company-content.active {
             opacity: 1;
-            transform: translateY(0);
         }
 
         .logo-placeholder {
             width: 50px;
             height: 50px;
             background: transparent;
-            border: none;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.4);
             flex-shrink: 0;
             overflow: hidden;
         }
@@ -125,12 +102,10 @@
             color: #7289da;
             text-decoration: none;
             font-weight: 500;
-            transition: all 0.2s ease;
         }
 
         .discord-link:hover {
             color: #99aef5;
-            text-shadow: 0 0 8px rgba(114, 137, 218, 0.4);
         }
 
         .mutiny-content .company-name {
@@ -170,46 +145,32 @@
             border-radius: 2px;
         }
 
-        /* Subtle animation line */
-        .animation-line {
+        /* Progress bar */
+        .progress-bar {
             position: absolute;
             bottom: 0;
             left: 0;
             height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            background: rgba(255, 255, 255, 0.4);
             width: 0%;
+            transition: none;
         }
 
-        @keyframes progressLine {
-            from {
-                width: 0%;
-            }
-            to {
-                width: 100%;
-            }
+        /* Debug info */
+        .debug {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 4px;
+            display: none;
         }
 
-        .animation-line.active {
-            animation: progressLine 5s linear forwards;
-        }
-
-        /* Glow effect on hover */
-        .company-card::before {
-            content: '';
-            position: absolute;
-            top: -1px;
-            left: -1px;
-            right: -1px;
-            bottom: -1px;
-            background: linear-gradient(45deg, #ff0080, #00ff88);
-            border-radius: 12px;
-            opacity: 0;
-            z-index: -1;
-            transition: opacity 0.3s ease;
-        }
-
-        .company-card:hover::before {
-            opacity: 0.3;
+        .debug.show {
+            display: block;
         }
     </style>
 </head>
@@ -218,9 +179,9 @@
         <div class="company-card">
             <div class="card-slider">
                 <!-- Mutiny Content -->
-                <div class="company-content mutiny-content active">
+                <div class="company-content mutiny-content active" data-index="0">
                     <div class="logo-placeholder">
-                        <img src="mutiny-logo.png" alt="Mutiny Logo">
+                        <img src="mutiny-logo.png" alt="Mutiny Logo" onerror="this.style.display='none'">
                     </div>
                     <div class="company-info">
                         <div class="company-name">MUTINY</div>
@@ -232,14 +193,14 @@
                 </div>
 
                 <!-- Bastion Guard Content -->
-                <div class="company-content bastion-content">
+                <div class="company-content bastion-content" data-index="1">
                     <div class="logo-placeholder">
-                        <img src="bastion-logo.png" alt="Bastion Guard Logo">
+                        <img src="bastion-logo.png" alt="Bastion Guard Logo" onerror="this.style.display='none'">
                     </div>
                     <div class="company-info">
                         <div class="company-name">BASTION GUARD</div>
                         <div class="company-detail">
-                            Game Hosting • Minecraft<br>
+                            Game Hosting Service<br>
                             💬 <a href="https://discord.gg/bastionguard" class="discord-link" target="_blank">discord.gg/bastionguard</a>
                         </div>
                     </div>
@@ -248,124 +209,152 @@
 
             <!-- Progress dots -->
             <div class="progress-dots">
-                <div class="dot active"></div>
-                <div class="dot"></div>
+                <div class="dot active" data-index="0"></div>
+                <div class="dot" data-index="1"></div>
             </div>
 
-            <!-- Animation line -->
-            <div class="animation-line active"></div>
+            <!-- Progress bar -->
+            <div class="progress-bar"></div>
         </div>
     </div>
 
+    <!-- Debug info -->
+    <div class="debug" id="debug">
+        <div id="debug-info">Initializing...</div>
+    </div>
+
     <script>
-        // Ensure script runs after DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get URL parameters for customization
-            const urlParams = new URLSearchParams(window.location.search);
-            const position = urlParams.get('position') || 'bottom-left';
-            const scale = urlParams.get('scale') || '100';
-            const transitionTime = parseInt(urlParams.get('transition') || '5') * 1000; // Convert to milliseconds
-            const autohide = parseInt(urlParams.get('autohide') || '0');
-            
-            // Apply position settings
-            const widgetContainer = document.querySelector('.widget-container');
-            if (position.includes('bottom')) {
-                widgetContainer.style.bottom = '20px';
-                widgetContainer.style.top = 'auto';
-            } else {
-                widgetContainer.style.top = '20px';
-                widgetContainer.style.bottom = 'auto';
+        // Configuration
+        const urlParams = new URLSearchParams(window.location.search);
+        const position = urlParams.get('position') || 'bottom-left';
+        const scale = urlParams.get('scale') || '100';
+        const transitionTime = parseInt(urlParams.get('transition') || '5') * 1000;
+        const debug = urlParams.get('debug') === 'true';
+        
+        // Show debug info if requested
+        if (debug) {
+            document.getElementById('debug').classList.add('show');
+        }
+        
+        function log(msg) {
+            console.log(`[Widget] ${msg}`);
+            if (debug) {
+                document.getElementById('debug-info').textContent = msg;
             }
-            if (position.includes('left')) {
-                widgetContainer.style.left = '20px';
-                widgetContainer.style.right = 'auto';
-            } else {
-                widgetContainer.style.right = '20px';
-                widgetContainer.style.left = 'auto';
-            }
+        }
+        
+        // Apply positioning
+        const widgetContainer = document.querySelector('.widget-container');
+        if (position.includes('bottom')) {
+            widgetContainer.style.bottom = '20px';
+            widgetContainer.style.top = 'auto';
+        } else {
+            widgetContainer.style.top = '20px';
+            widgetContainer.style.bottom = 'auto';
+        }
+        if (position.includes('left')) {
+            widgetContainer.style.left = '20px';
+            widgetContainer.style.right = 'auto';
+        } else {
+            widgetContainer.style.right = '20px';
+            widgetContainer.style.left = 'auto';
+        }
+        
+        // Apply scale
+        widgetContainer.style.transform = `scale(${scale/100})`;
+        widgetContainer.style.transformOrigin = position.includes('left') ? 'left' : 'right';
+        
+        // Animation variables
+        let currentIndex = 0;
+        let animationInterval;
+        let progressInterval;
+        
+        const contents = document.querySelectorAll('.company-content');
+        const dots = document.querySelectorAll('.dot');
+        const progressBar = document.querySelector('.progress-bar');
+        
+        log(`Found ${contents.length} content sections`);
+        
+        // Simple transition function
+        function switchContent() {
+            log(`Switching from index ${currentIndex}`);
             
-            // Apply scale
-            widgetContainer.style.transform = `scale(${scale/100})`;
-            widgetContainer.style.transformOrigin = position.includes('left') ? 'left' : 'right';
-            
-            // Transition between companies
-            const contents = document.querySelectorAll('.company-content');
-            const dots = document.querySelectorAll('.dot');
-            const animationLine = document.querySelector('.animation-line');
-            let currentIndex = 0;
-            let intervalId;
-            
-            // Update animation duration
-            const animationRule = document.styleSheets[0].cssRules || document.styleSheets[0].rules;
-            for (let i = 0; i < animationRule.length; i++) {
-                if (animationRule[i].name === 'progressLine') {
-                    animationRule[i].style.animationDuration = `${transitionTime}ms`;
-                    break;
-                }
-            }
-            
-            // Set animation duration dynamically
-            animationLine.style.animationDuration = `${transitionTime}ms`;
-            
-            function switchContent() {
-                // Reset animation line
-                animationLine.classList.remove('active');
-                void animationLine.offsetWidth; // Force reflow
-                
-                // Remove active class from all
-                contents.forEach(content => content.classList.remove('active'));
-                dots.forEach(dot => dot.classList.remove('active'));
-                
-                // Move to next index
-                currentIndex = (currentIndex + 1) % contents.length;
-                
-                // Add active class to current
-                setTimeout(() => {
-                    contents[currentIndex].classList.add('active');
-                    dots[currentIndex].classList.add('active');
-                    animationLine.classList.add('active');
-                }, 50);
-            }
-            
-            // Start the transition cycle
-            function startCycle() {
-                intervalId = setInterval(switchContent, transitionTime);
-            }
-            
-            startCycle();
-            
-            // Auto-hide functionality
-            if (autohide > 0) {
-                let hideTimeout;
-                const card = document.querySelector('.company-card');
-                
-                function showWidget() {
-                    card.style.opacity = '1';
-                    clearTimeout(hideTimeout);
-                    
-                    hideTimeout = setTimeout(() => {
-                        card.style.opacity = '0.7';
-                    }, autohide * 1000);
-                }
-                
-                card.style.transition = 'opacity 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease';
-                showWidget();
-                document.addEventListener('mousemove', showWidget);
-            }
-            
-            // Pause transitions on hover
-            const card = document.querySelector('.company-card');
-            
-            card.addEventListener('mouseenter', () => {
-                clearInterval(intervalId);
-                animationLine.style.animationPlayState = 'paused';
+            // Hide all
+            contents.forEach((content, i) => {
+                content.classList.remove('active');
+                content.style.opacity = '0';
             });
+            dots.forEach(dot => dot.classList.remove('active'));
             
-            card.addEventListener('mouseleave', () => {
-                animationLine.style.animationPlayState = 'running';
-                clearInterval(intervalId);
-                startCycle();
-            });
+            // Update index
+            currentIndex = (currentIndex + 1) % contents.length;
+            
+            // Show new content
+            setTimeout(() => {
+                contents[currentIndex].classList.add('active');
+                contents[currentIndex].style.opacity = '1';
+                dots[currentIndex].classList.add('active');
+                log(`Switched to index ${currentIndex}`);
+            }, 100);
+            
+            // Reset progress bar
+            progressBar.style.transition = 'none';
+            progressBar.style.width = '0%';
+            
+            setTimeout(() => {
+                progressBar.style.transition = `width ${transitionTime}ms linear`;
+                progressBar.style.width = '100%';
+            }, 200);
+        }
+        
+        // Start animation loop
+        function startAnimation() {
+            log('Starting animation loop');
+            
+            // Initial progress bar
+            progressBar.style.transition = `width ${transitionTime}ms linear`;
+            progressBar.style.width = '100%';
+            
+            // Set up interval
+            animationInterval = setInterval(() => {
+                switchContent();
+            }, transitionTime);
+            
+            log(`Animation started with ${transitionTime}ms interval`);
+        }
+        
+        // Stop animation
+        function stopAnimation() {
+            log('Stopping animation');
+            clearInterval(animationInterval);
+            progressBar.style.transition = 'none';
+        }
+        
+        // Initialize after a short delay to ensure browser source is ready
+        setTimeout(() => {
+            log('Initializing widget');
+            
+            // Make sure first content is visible
+            contents[0].style.opacity = '1';
+            
+            // Start the animation
+            startAnimation();
+        }, 500);
+        
+        // Restart animation periodically in case it stops (Streamlabs workaround)
+        setInterval(() => {
+            if (!document.hidden) {
+                log('Heartbeat check');
+            }
+        }, 10000);
+        
+        // Handle visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAnimation();
+            } else {
+                setTimeout(startAnimation, 100);
+            }
         });
     </script>
 </body>
