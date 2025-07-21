@@ -207,13 +207,15 @@
             <div class="card-slider">
                 <!-- Mutiny Content -->
                 <div class="company-content mutiny-content active">
-                    <div class="mutiny.png">
+<div class="logo-placeholder">
+    <img src="https://i.imgur.com/cxyeW9L.png" alt="Mutiny Logo">
+</div>
                         <span>LOGO</span>
                     </div>
                     <div class="company-info">
                         <div class="company-name">MUTINY</div>
                         <div class="company-detail">
-                            #1 DarkRP Server<br>
+                            #1 Garry's Mod DarkRP Server<br>
                             💬 <a href="https://discord.gg/mutiny" class="discord-link" target="_blank">discord.gg/mutiny</a>
                         </div>
                     </div>
@@ -221,14 +223,16 @@
 
                 <!-- Bastion Guard Content -->
                 <div class="company-content bastion-content">
-                    <div class="bastion.png">
+<div class="logo-placeholder">
+    <img src="https://i.imgur.com/lR61IkQ.png" alt="Bastion Guard Logo">
+</div>
                         <span>LOGO</span>
                     </div>
                     <div class="company-info">
                         <div class="company-name">BASTION GUARD</div>
                         <div class="company-detail">
                             Game Hosting • Minecraft<br>
-                            <span style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Garry's Mod & Rust coming soon</span>
+                            💬 <a href="https://discord.gg/bastionguard" class="discord-link" target="_blank">discord.gg/bastionguard</a>
                         </div>
                     </div>
                 </div>
@@ -252,13 +256,6 @@
         const scale = urlParams.get('scale') || '100';
         const transitionTime = parseInt(urlParams.get('transition') || '5') * 1000; // Convert to milliseconds
         const autohide = parseInt(urlParams.get('autohide') || '0');
-        const bastionDiscord = urlParams.get('bastionDiscord') || '';
-        
-        // Add Bastion Discord link if provided
-        if (bastionDiscord) {
-            const bastionDetail = document.querySelector('.bastion-content .company-detail');
-            bastionDetail.innerHTML = `Game Hosting • Minecraft<br>💬 <a href="https://discord.gg/${bastionDiscord}" class="discord-link" target="_blank">discord.gg/${bastionDiscord}</a>`;
-        }
         
         // Apply position settings
         const widgetContainer = document.querySelector('.widget-container');
