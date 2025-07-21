@@ -60,13 +60,33 @@
 
         /* CSS Animation for alternating content */
         @keyframes fadeInOut1 {
-            0%, 45%, 100% { opacity: 1; }
-            50%, 95% { opacity: 0; }
+            0%, 48% { 
+                opacity: 1; 
+                visibility: visible;
+            }
+            49%, 51% { 
+                opacity: 0; 
+                visibility: hidden;
+            }
+            52%, 100% { 
+                opacity: 0; 
+                visibility: hidden;
+            }
         }
 
         @keyframes fadeInOut2 {
-            0%, 45%, 100% { opacity: 0; }
-            50%, 95% { opacity: 1; }
+            0%, 48% { 
+                opacity: 0; 
+                visibility: hidden;
+            }
+            49%, 51% { 
+                opacity: 0; 
+                visibility: hidden;
+            }
+            52%, 100% { 
+                opacity: 1; 
+                visibility: visible;
+            }
         }
 
         .company-content {
@@ -75,16 +95,22 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            animation-duration: 120s;
+            animation-duration: 120s; /* Changed from 10s to 120s */
+            animation-iteration-count: infinite;
+        }
+            gap: 15px;
+            animation-duration: 10s;
             animation-iteration-count: infinite;
         }
 
         .company-content.mutiny-content {
             animation-name: fadeInOut1;
+            z-index: 2;
         }
 
         .company-content.bastion-content {
             animation-name: fadeInOut2;
+            z-index: 1;
         }
 
         .logo-placeholder {
@@ -156,17 +182,17 @@
             height: 4px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.2);
-            animation-duration: 120s;
+            animation-duration: 120s; /* Changed to 120s */
             animation-iteration-count: infinite;
         }
 
         @keyframes dot1 {
-            0%, 45%, 100% { 
+            0%, 48% { 
                 background: rgba(255, 255, 255, 0.8);
                 width: 12px;
                 border-radius: 2px;
             }
-            50%, 95% { 
+            52%, 100% { 
                 background: rgba(255, 255, 255, 0.2);
                 width: 4px;
                 border-radius: 50%;
@@ -174,12 +200,12 @@
         }
 
         @keyframes dot2 {
-            0%, 45%, 100% { 
+            0%, 48% { 
                 background: rgba(255, 255, 255, 0.2);
                 width: 4px;
                 border-radius: 50%;
             }
-            50%, 95% { 
+            52%, 100% { 
                 background: rgba(255, 255, 255, 0.8);
                 width: 12px;
                 border-radius: 2px;
@@ -197,9 +223,9 @@
         /* Progress bar animation */
         @keyframes progress {
             0% { width: 0%; }
-            45% { width: 100%; }
+            48% { width: 100%; }
             50% { width: 0%; }
-            95% { width: 100%; }
+            98% { width: 100%; }
             100% { width: 0%; }
         }
 
@@ -209,7 +235,7 @@
             left: 0;
             height: 2px;
             background: rgba(255, 255, 255, 0.4);
-            animation: progress 120s linear infinite;
+            animation: progress 120s linear infinite; /* Changed to 120s */
         }
     </style>
 </head>
