@@ -11,11 +11,14 @@
             box-sizing: border-box;
         }
 
-        body {
+        html, body {
             font-family: 'Arial', sans-serif;
-            background: transparent;
+            background: transparent !important;
+            background-color: rgba(0, 0, 0, 0) !important;
             color: white;
             overflow: hidden;
+            width: 100%;
+            height: 100%;
         }
 
         .widget-container {
@@ -82,8 +85,8 @@
         .logo-placeholder {
             width: 50px;
             height: 50px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px dashed rgba(255, 255, 255, 0.2);
+            background: transparent;
+            border: none;
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -91,6 +94,7 @@
             font-size: 10px;
             color: rgba(255, 255, 255, 0.4);
             flex-shrink: 0;
+            overflow: hidden;
         }
 
         .logo-placeholder img {
@@ -174,11 +178,19 @@
             height: 2px;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             width: 0%;
-            transition: width 5s linear;
+        }
+
+        @keyframes progressLine {
+            from {
+                width: 0%;
+            }
+            to {
+                width: 100%;
+            }
         }
 
         .animation-line.active {
-            width: 100%;
+            animation: progressLine 5s linear forwards;
         }
 
         /* Glow effect on hover */
@@ -208,7 +220,7 @@
                 <!-- Mutiny Content -->
                 <div class="company-content mutiny-content active">
                     <div class="logo-placeholder">
-<img src="mutiny-logo.png" alt="Mutiny Logo">
+                        <img src="mutiny-logo.png" alt="Mutiny Logo">
                     </div>
                     <div class="company-info">
                         <div class="company-name">MUTINY</div>
@@ -222,7 +234,7 @@
                 <!-- Bastion Guard Content -->
                 <div class="company-content bastion-content">
                     <div class="logo-placeholder">
-<img src="bastion-logo.png" alt="Bastion Guard Logo">
+                        <img src="bastion-logo.png" alt="Bastion Guard Logo">
                     </div>
                     <div class="company-info">
                         <div class="company-name">BASTION GUARD</div>
@@ -241,108 +253,119 @@
             </div>
 
             <!-- Animation line -->
-            <div class="animation-line"></div>
+            <div class="animation-line active"></div>
         </div>
     </div>
 
     <script>
-        // Get URL parameters for customization
-        const urlParams = new URLSearchParams(window.location.search);
-        const position = urlParams.get('position') || 'bottom-left';
-        const scale = urlParams.get('scale') || '100';
-        const transitionTime = parseInt(urlParams.get('transition') || '5') * 1000; // Convert to milliseconds
-        const autohide = parseInt(urlParams.get('autohide') || '0');
-        
-        // Apply position settings
-        const widgetContainer = document.querySelector('.widget-container');
-        if (position.includes('bottom')) {
-            widgetContainer.style.bottom = '20px';
-            widgetContainer.style.top = 'auto';
-        } else {
-            widgetContainer.style.top = '20px';
-            widgetContainer.style.bottom = 'auto';
-        }
-        if (position.includes('left')) {
-            widgetContainer.style.left = '20px';
-            widgetContainer.style.right = 'auto';
-        } else {
-            widgetContainer.style.right = '20px';
-            widgetContainer.style.left = 'auto';
-        }
-        
-        // Apply scale
-        widgetContainer.style.transform = `scale(${scale/100})`;
-        widgetContainer.style.transformOrigin = position.includes('left') ? 'left' : 'right';
-        
-        // Transition between companies
-        const contents = document.querySelectorAll('.company-content');
-        const dots = document.querySelectorAll('.dot');
-        const animationLine = document.querySelector('.animation-line');
-        let currentIndex = 0;
-        
-        function switchContent() {
-            // Reset animation line
-            animationLine.classList.remove('active');
+        // Ensure script runs after DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get URL parameters for customization
+            const urlParams = new URLSearchParams(window.location.search);
+            const position = urlParams.get('position') || 'bottom-left';
+            const scale = urlParams.get('scale') || '100';
+            const transitionTime = parseInt(urlParams.get('transition') || '5') * 1000; // Convert to milliseconds
+            const autohide = parseInt(urlParams.get('autohide') || '0');
             
-            // Remove active class from all
-            contents.forEach(content => content.classList.remove('active'));
-            dots.forEach(dot => dot.classList.remove('active'));
-            
-            // Move to next index
-            currentIndex = (currentIndex + 1) % contents.length;
-            
-            // Add active class to current
-            contents[currentIndex].classList.add('active');
-            dots[currentIndex].classList.add('active');
-            
-            // Start animation line
-            setTimeout(() => {
-                animationLine.classList.add('active');
-            }, 100);
-        }
-        
-        // Start the transition cycle
-        setInterval(switchContent, transitionTime);
-        
-        // Start animation line for first slide
-        setTimeout(() => {
-            animationLine.classList.add('active');
-        }, 100);
-        
-        // Update animation line duration based on transition time
-        animationLine.style.transition = `width ${transitionTime}ms linear`;
-        
-        // Auto-hide functionality
-        if (autohide > 0) {
-            let hideTimeout;
-            const card = document.querySelector('.company-card');
-            
-            function showWidget() {
-                card.style.opacity = '1';
-                clearTimeout(hideTimeout);
-                
-                hideTimeout = setTimeout(() => {
-                    card.style.opacity = '0.7';
-                }, autohide * 1000);
+            // Apply position settings
+            const widgetContainer = document.querySelector('.widget-container');
+            if (position.includes('bottom')) {
+                widgetContainer.style.bottom = '20px';
+                widgetContainer.style.top = 'auto';
+            } else {
+                widgetContainer.style.top = '20px';
+                widgetContainer.style.bottom = 'auto';
+            }
+            if (position.includes('left')) {
+                widgetContainer.style.left = '20px';
+                widgetContainer.style.right = 'auto';
+            } else {
+                widgetContainer.style.right = '20px';
+                widgetContainer.style.left = 'auto';
             }
             
-            card.style.transition = 'opacity 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease';
-            showWidget();
-            document.addEventListener('mousemove', showWidget);
-        }
-        
-        // Pause transitions on hover
-        const card = document.querySelector('.company-card');
-        let intervalId = setInterval(switchContent, transitionTime);
-        
-        card.addEventListener('mouseenter', () => {
-            clearInterval(intervalId);
-            animationLine.style.animationPlayState = 'paused';
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            animationLine.style.animationPlayState = 'running';
-            intervalId = setInterval(switchContent, transitionTime);
+            // Apply scale
+            widgetContainer.style.transform = `scale(${scale/100})`;
+            widgetContainer.style.transformOrigin = position.includes('left') ? 'left' : 'right';
+            
+            // Transition between companies
+            const contents = document.querySelectorAll('.company-content');
+            const dots = document.querySelectorAll('.dot');
+            const animationLine = document.querySelector('.animation-line');
+            let currentIndex = 0;
+            let intervalId;
+            
+            // Update animation duration
+            const animationRule = document.styleSheets[0].cssRules || document.styleSheets[0].rules;
+            for (let i = 0; i < animationRule.length; i++) {
+                if (animationRule[i].name === 'progressLine') {
+                    animationRule[i].style.animationDuration = `${transitionTime}ms`;
+                    break;
+                }
+            }
+            
+            // Set animation duration dynamically
+            animationLine.style.animationDuration = `${transitionTime}ms`;
+            
+            function switchContent() {
+                // Reset animation line
+                animationLine.classList.remove('active');
+                void animationLine.offsetWidth; // Force reflow
+                
+                // Remove active class from all
+                contents.forEach(content => content.classList.remove('active'));
+                dots.forEach(dot => dot.classList.remove('active'));
+                
+                // Move to next index
+                currentIndex = (currentIndex + 1) % contents.length;
+                
+                // Add active class to current
+                setTimeout(() => {
+                    contents[currentIndex].classList.add('active');
+                    dots[currentIndex].classList.add('active');
+                    animationLine.classList.add('active');
+                }, 50);
+            }
+            
+            // Start the transition cycle
+            function startCycle() {
+                intervalId = setInterval(switchContent, transitionTime);
+            }
+            
+            startCycle();
+            
+            // Auto-hide functionality
+            if (autohide > 0) {
+                let hideTimeout;
+                const card = document.querySelector('.company-card');
+                
+                function showWidget() {
+                    card.style.opacity = '1';
+                    clearTimeout(hideTimeout);
+                    
+                    hideTimeout = setTimeout(() => {
+                        card.style.opacity = '0.7';
+                    }, autohide * 1000);
+                }
+                
+                card.style.transition = 'opacity 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease';
+                showWidget();
+                document.addEventListener('mousemove', showWidget);
+            }
+            
+            // Pause transitions on hover
+            const card = document.querySelector('.company-card');
+            
+            card.addEventListener('mouseenter', () => {
+                clearInterval(intervalId);
+                animationLine.style.animationPlayState = 'paused';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                animationLine.style.animationPlayState = 'running';
+                clearInterval(intervalId);
+                startCycle();
+            });
         });
     </script>
 </body>
