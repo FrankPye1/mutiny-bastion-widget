@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Streaming Widget - Mutiny & Bastion Guard</title>
+    <title>Streaming Widget - CSS Only</title>
     <style>
         * {
             margin: 0;
@@ -17,15 +17,14 @@
             background-color: rgba(0, 0, 0, 0) !important;
             color: white;
             overflow: hidden;
-            width: 100%;
-            height: 100%;
         }
 
         .widget-container {
             position: fixed;
             bottom: 20px;
             left: 20px;
-            z-index: 1000;
+            width: 320px;
+            height: 90px;
         }
 
         .company-card {
@@ -33,8 +32,8 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             padding: 15px 18px;
-            width: 320px;
-            height: 90px;
+            width: 100%;
+            height: 100%;
             backdrop-filter: blur(8px);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             position: relative;
@@ -48,18 +47,33 @@
             align-items: center;
         }
 
+        /* CSS Animation for alternating content */
+        @keyframes fadeInOut1 {
+            0%, 45%, 100% { opacity: 1; }
+            50%, 95% { opacity: 0; }
+        }
+
+        @keyframes fadeInOut2 {
+            0%, 45%, 100% { opacity: 0; }
+            50%, 95% { opacity: 1; }
+        }
+
         .company-content {
             position: absolute;
             width: 100%;
             display: flex;
             align-items: center;
             gap: 15px;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
+            animation-duration: 10s;
+            animation-iteration-count: infinite;
         }
 
-        .company-content.active {
-            opacity: 1;
+        .company-content.mutiny-content {
+            animation-name: fadeInOut1;
+        }
+
+        .company-content.bastion-content {
+            animation-name: fadeInOut2;
         }
 
         .logo-placeholder {
@@ -71,7 +85,6 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            overflow: hidden;
         }
 
         .logo-placeholder img {
@@ -104,10 +117,6 @@
             font-weight: 500;
         }
 
-        .discord-link:hover {
-            color: #99aef5;
-        }
-
         .mutiny-content .company-name {
             background: linear-gradient(45deg, #ff0080, #ff4080);
             -webkit-background-clip: text;
@@ -122,7 +131,7 @@
             background-clip: text;
         }
 
-        /* Progress indicator dots */
+        /* Progress dots with CSS animation */
         .progress-dots {
             position: absolute;
             bottom: 8px;
@@ -136,41 +145,60 @@
             height: 4px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
+            animation-duration: 10s;
+            animation-iteration-count: infinite;
         }
 
-        .dot.active {
-            background: rgba(255, 255, 255, 0.8);
-            width: 12px;
-            border-radius: 2px;
+        @keyframes dot1 {
+            0%, 45%, 100% { 
+                background: rgba(255, 255, 255, 0.8);
+                width: 12px;
+                border-radius: 2px;
+            }
+            50%, 95% { 
+                background: rgba(255, 255, 255, 0.2);
+                width: 4px;
+                border-radius: 50%;
+            }
         }
 
-        /* Progress bar */
+        @keyframes dot2 {
+            0%, 45%, 100% { 
+                background: rgba(255, 255, 255, 0.2);
+                width: 4px;
+                border-radius: 50%;
+            }
+            50%, 95% { 
+                background: rgba(255, 255, 255, 0.8);
+                width: 12px;
+                border-radius: 2px;
+            }
+        }
+
+        .dot:nth-child(1) {
+            animation-name: dot1;
+        }
+
+        .dot:nth-child(2) {
+            animation-name: dot2;
+        }
+
+        /* Progress bar animation */
+        @keyframes progress {
+            0% { width: 0%; }
+            45% { width: 100%; }
+            50% { width: 0%; }
+            95% { width: 100%; }
+            100% { width: 0%; }
+        }
+
         .progress-bar {
             position: absolute;
             bottom: 0;
             left: 0;
             height: 2px;
             background: rgba(255, 255, 255, 0.4);
-            width: 0%;
-            transition: none;
-        }
-
-        /* Debug info */
-        .debug {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 5px 10px;
-            font-size: 12px;
-            border-radius: 4px;
-            display: none;
-        }
-
-        .debug.show {
-            display: block;
+            animation: progress 10s linear infinite;
         }
     </style>
 </head>
@@ -179,7 +207,7 @@
         <div class="company-card">
             <div class="card-slider">
                 <!-- Mutiny Content -->
-                <div class="company-content mutiny-content active" data-index="0">
+                <div class="company-content mutiny-content">
                     <div class="logo-placeholder">
                         <img src="mutiny-logo.png" alt="Mutiny Logo" onerror="this.style.display='none'">
                     </div>
@@ -193,14 +221,14 @@
                 </div>
 
                 <!-- Bastion Guard Content -->
-                <div class="company-content bastion-content" data-index="1">
+                <div class="company-content bastion-content">
                     <div class="logo-placeholder">
                         <img src="bastion-logo.png" alt="Bastion Guard Logo" onerror="this.style.display='none'">
                     </div>
                     <div class="company-info">
                         <div class="company-name">BASTION GUARD</div>
                         <div class="company-detail">
-                            Game Hosting Service<br>
+                            Game Hosting • Minecraft<br>
                             💬 <a href="https://discord.gg/bastionguard" class="discord-link" target="_blank">discord.gg/bastionguard</a>
                         </div>
                     </div>
@@ -209,153 +237,13 @@
 
             <!-- Progress dots -->
             <div class="progress-dots">
-                <div class="dot active" data-index="0"></div>
-                <div class="dot" data-index="1"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
             </div>
 
             <!-- Progress bar -->
             <div class="progress-bar"></div>
         </div>
     </div>
-
-    <!-- Debug info -->
-    <div class="debug" id="debug">
-        <div id="debug-info">Initializing...</div>
-    </div>
-
-    <script>
-        // Configuration
-        const urlParams = new URLSearchParams(window.location.search);
-        const position = urlParams.get('position') || 'bottom-left';
-        const scale = urlParams.get('scale') || '100';
-        const transitionTime = parseInt(urlParams.get('transition') || '5') * 1000;
-        const debug = urlParams.get('debug') === 'true';
-        
-        // Show debug info if requested
-        if (debug) {
-            document.getElementById('debug').classList.add('show');
-        }
-        
-        function log(msg) {
-            console.log(`[Widget] ${msg}`);
-            if (debug) {
-                document.getElementById('debug-info').textContent = msg;
-            }
-        }
-        
-        // Apply positioning
-        const widgetContainer = document.querySelector('.widget-container');
-        if (position.includes('bottom')) {
-            widgetContainer.style.bottom = '20px';
-            widgetContainer.style.top = 'auto';
-        } else {
-            widgetContainer.style.top = '20px';
-            widgetContainer.style.bottom = 'auto';
-        }
-        if (position.includes('left')) {
-            widgetContainer.style.left = '20px';
-            widgetContainer.style.right = 'auto';
-        } else {
-            widgetContainer.style.right = '20px';
-            widgetContainer.style.left = 'auto';
-        }
-        
-        // Apply scale
-        widgetContainer.style.transform = `scale(${scale/100})`;
-        widgetContainer.style.transformOrigin = position.includes('left') ? 'left' : 'right';
-        
-        // Animation variables
-        let currentIndex = 0;
-        let animationInterval;
-        let progressInterval;
-        
-        const contents = document.querySelectorAll('.company-content');
-        const dots = document.querySelectorAll('.dot');
-        const progressBar = document.querySelector('.progress-bar');
-        
-        log(`Found ${contents.length} content sections`);
-        
-        // Simple transition function
-        function switchContent() {
-            log(`Switching from index ${currentIndex}`);
-            
-            // Hide all
-            contents.forEach((content, i) => {
-                content.classList.remove('active');
-                content.style.opacity = '0';
-            });
-            dots.forEach(dot => dot.classList.remove('active'));
-            
-            // Update index
-            currentIndex = (currentIndex + 1) % contents.length;
-            
-            // Show new content
-            setTimeout(() => {
-                contents[currentIndex].classList.add('active');
-                contents[currentIndex].style.opacity = '1';
-                dots[currentIndex].classList.add('active');
-                log(`Switched to index ${currentIndex}`);
-            }, 100);
-            
-            // Reset progress bar
-            progressBar.style.transition = 'none';
-            progressBar.style.width = '0%';
-            
-            setTimeout(() => {
-                progressBar.style.transition = `width ${transitionTime}ms linear`;
-                progressBar.style.width = '100%';
-            }, 200);
-        }
-        
-        // Start animation loop
-        function startAnimation() {
-            log('Starting animation loop');
-            
-            // Initial progress bar
-            progressBar.style.transition = `width ${transitionTime}ms linear`;
-            progressBar.style.width = '100%';
-            
-            // Set up interval
-            animationInterval = setInterval(() => {
-                switchContent();
-            }, transitionTime);
-            
-            log(`Animation started with ${transitionTime}ms interval`);
-        }
-        
-        // Stop animation
-        function stopAnimation() {
-            log('Stopping animation');
-            clearInterval(animationInterval);
-            progressBar.style.transition = 'none';
-        }
-        
-        // Initialize after a short delay to ensure browser source is ready
-        setTimeout(() => {
-            log('Initializing widget');
-            
-            // Make sure first content is visible
-            contents[0].style.opacity = '1';
-            
-            // Start the animation
-            startAnimation();
-        }, 500);
-        
-        // Restart animation periodically in case it stops (Streamlabs workaround)
-        setInterval(() => {
-            if (!document.hidden) {
-                log('Heartbeat check');
-            }
-        }, 10000);
-        
-        // Handle visibility changes
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                stopAnimation();
-            } else {
-                setTimeout(startAnimation, 100);
-            }
-        });
-    </script>
 </body>
 </html>
