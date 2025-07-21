@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streaming Widget - Mutiny & Bastion Guard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: transparent;
+            color: white;
+            overflow: hidden;
+        }
+
+        .widget-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .company-card {
+            background: linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(30, 30, 45, 0.95));
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 20px;
+            width: 350px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            animation: slideIn 0.8s ease-out;
+            transition: all 0.3s ease;
+        }
+
+        .company-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        .company-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ff0080, #8000ff, #00ff88, #ff0080);
+            background-size: 400% 400%;
+            border-radius: 15px;
+            z-index: -1;
+            animation: gradient 3s ease infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .company-card:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .logo-placeholder {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.2));
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .company-card:hover .logo-placeholder {
+            border-color: rgba(255, 255, 255, 0.6);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.25));
+        }
+
+        .company-info h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .company-tagline {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mutiny-card {
+            animation-delay: 0.2s;
+        }
+
+        .mutiny-card .company-info h2 {
+            background: linear-gradient(45deg, #ff0080, #ff4080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .bastion-card {
+            animation-delay: 0.5s;
+        }
+
+        .bastion-card .company-info h2 {
+            background: linear-gradient(45deg, #00ff88, #00ffcc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pulse {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(0, 255, 136, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
+            }
+        }
+
+        .discord-link {
+            color: #7289da;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .discord-link:hover {
+            color: #99aef5;
+            text-shadow: 0 0 10px rgba(114, 137, 218, 0.5);
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 10s infinite linear;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100%) translateX(0);
+            }
+            to {
+                transform: translateY(-100vh) translateX(100px);
+            }
+        }
+
+        /* Logo image styles */
+        .logo-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-container">
+        <!-- Mutiny Card -->
+        <div class="company-card mutiny-card">
+            <div class="particles">
+                <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+                <div class="particle" style="left: 30%; animation-delay: 2s;"></div>
+                <div class="particle" style="left: 60%; animation-delay: 4s;"></div>
+                <div class="particle" style="left: 80%; animation-delay: 6s;"></div>
+            </div>
+            
+            <div class="card-header">
+                <div class="logo-placeholder">
+                    <!-- Add your Mutiny logo here -->
+                    <span>LOGO</span>
+                </div>
+                <div class="company-info">
+                    <h2>MUTINY</h2>
+                    <div class="company-tagline">DarkRP Gaming Server</div>
+                </div>
+            </div>
+            
+            <div class="card-content">
+                <div class="info-item">
+                    <div class="icon">🎮</div>
+                    <span>Premium DarkRP Experience</span>
+                </div>
+                <div class="info-item">
+                    <div class="icon">💬</div>
+                    <span>Discord: <a href="https://discord.gg/mutiny" class="discord-link">discord.gg/mutiny</a></span>
+                </div>
+                <div class="info-item">
+                    <div class="icon"><span class="pulse"></span></div>
+                    <span>Join Now - Active Community!</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bastion Guard Card -->
+        <div class="company-card bastion-card">
+            <div class="particles">
+                <div class="particle" style="left: 20%; animation-delay: 1s;"></div>
+                <div class="particle" style="left: 40%; animation-delay: 3s;"></div>
+                <div class="particle" style="left: 70%; animation-delay: 5s;"></div>
+                <div class="particle" style="left: 90%; animation-delay: 7s;"></div>
+            </div>
+            
+            <div class="card-header">
+                <div class="logo-placeholder">
+                    <!-- Add your Bastion Guard logo here -->
+                    <span>LOGO</span>
+                </div>
+                <div class="company-info">
+                    <h2>BASTION GUARD</h2>
+                    <div class="company-tagline">Premium Game Hosting</div>
+                </div>
+            </div>
+            
+            <div class="card-content">
+                <div class="info-item">
+                    <div class="icon">⚡</div>
+                    <span>High-Performance Minecraft Servers</span>
+                </div>
+                <div class="info-item">
+                    <div class="icon">🚀</div>
+                    <span>More Games Coming Soon!</span>
+                </div>
+                <div class="info-item">
+                    <div class="icon">🛡️</div>
+                    <span>24/7 Support & DDoS Protection</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add dynamic hover effects
+        document.querySelectorAll('.company-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // Optional: Auto-hide/show functionality
+        let hideTimeout;
+        const widgetContainer = document.querySelector('.widget-container');
+        
+        function showWidget() {
+            widgetContainer.style.opacity = '1';
+            clearTimeout(hideTimeout);
+            
+            hideTimeout = setTimeout(() => {
+                widgetContainer.style.opacity = '0.7';
+            }, 10000); // Dim after 10 seconds
+        }
+        
+        // Initialize
+        widgetContainer.style.transition = 'opacity 0.5s ease';
+        showWidget();
+        
+        // Show on mouse movement
+        document.addEventListener('mousemove', showWidget);
+    </script>
+</body>
+</html>
