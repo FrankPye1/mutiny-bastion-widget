@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="only light">
     <title>Streaming Widget - CSS Only</title>
     <style>
         * {
@@ -13,10 +14,19 @@
 
         html, body {
             font-family: 'Arial', sans-serif;
-            background: transparent !important;
+            background: none !important;
+            background-color: transparent !important;
             background-color: rgba(0, 0, 0, 0) !important;
             color: white;
             overflow: hidden;
+        }
+        
+        body::before {
+            display: none !important;
+        }
+        
+        body::after {
+            display: none !important;
         }
 
         .widget-container {
@@ -25,6 +35,7 @@
             left: 20px;
             width: 320px;
             height: 90px;
+            background: transparent !important;
         }
 
         .company-card {
@@ -198,11 +209,11 @@
             left: 0;
             height: 2px;
             background: rgba(255, 255, 255, 0.4);
-            animation: progress 10s linear infinite;
+            animation: progress 120s linear infinite;
         }
     </style>
 </head>
-<body>
+<body style="background-color: transparent !important;">
     <div class="widget-container">
         <div class="company-card">
             <div class="card-slider">
